@@ -1,7 +1,7 @@
 
 // Test001.cpp : definisce i comportamenti delle classi per l'applicazione.
 //
-
+// prova
 #include "stdafx.h"
 #include "Test001.h"
 #include "Test001Dlg.h"
