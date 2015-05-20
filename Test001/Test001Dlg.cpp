@@ -20,16 +20,27 @@ CTest001Dlg::CTest001Dlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTest001Dlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	n1 = 3;
+	n2 = 2;
+	n3 = 1;
 }
 
 void CTest001Dlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+
+	DDX_Text(pDX, IDC_EDIT1, n1);
+	DDX_Text(pDX, IDC_EDIT2, n2);
+	DDX_Text(pDX, IDC_EDIT3, n3);
 }
 
 BEGIN_MESSAGE_MAP(CTest001Dlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_EN_CHANGE(IDC_EDIT2, &CTest001Dlg::OnEnChangeEdit2)
+	ON_EN_CHANGE(IDC_EDIT1, &CTest001Dlg::OnEnChangeEdit1)
+	ON_EN_CHANGE(IDC_EDIT3, &CTest001Dlg::OnEnChangeEdit3)
+	ON_BN_CLICKED(IDC_BUTTON1, &CTest001Dlg::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 
@@ -45,6 +56,8 @@ BOOL CTest001Dlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Impostare icona piccola.
 
 	// TODO: aggiungere qui inizializzazione aggiuntiva.
+	
+
 
 	return TRUE;  // restituisce TRUE a meno che non venga impostato lo stato attivo su un controllo.
 }
@@ -85,3 +98,52 @@ HCURSOR CTest001Dlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CTest001Dlg::OnEnChangeEdit2()
+{
+	// TODO:  Se si tratta di un controllo RICHEDIT, il controllo non
+	// invierà questa notifica a meno che non si esegua l'override della funzione CDialogEx::OnInitDialog()
+	// e venga eseguita la chiamata a CRichEditCtrl().SetEventMask()
+	// con il flag ENM_CHANGE introdotto dall'operatore OR nella maschera.
+
+	// TODO:  Aggiungere qui il codice per la gestione della notifica del controllo.
+	UpdateData(TRUE);
+}
+
+
+void CTest001Dlg::OnEnChangeEdit1()
+{
+	// TODO:  Se si tratta di un controllo RICHEDIT, il controllo non
+	// invierà questa notifica a meno che non si esegua l'override della funzione CDialogEx::OnInitDialog()
+	// e venga eseguita la chiamata a CRichEditCtrl().SetEventMask()
+	// con il flag ENM_CHANGE introdotto dall'operatore OR nella maschera.
+
+	// TODO:  Aggiungere qui il codice per la gestione della notifica del controllo.
+	UpdateData(TRUE);
+	//IDC_EDIT1
+	//n3 = n1 + n2;
+}
+
+
+void CTest001Dlg::OnEnChangeEdit3()
+{
+	// TODO:  Se si tratta di un controllo RICHEDIT, il controllo non
+	// invierà questa notifica a meno che non si esegua l'override della funzione CDialogEx::OnInitDialog()
+	// e venga eseguita la chiamata a CRichEditCtrl().SetEventMask()
+	// con il flag ENM_CHANGE introdotto dall'operatore OR nella maschera.
+
+	// TODO:  Aggiungere qui il codice per la gestione della notifica del controllo.
+	UpdateData(TRUE);
+	
+}
+
+
+void CTest001Dlg::OnBnClickedButton1()
+{
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+	
+
+	n3 = n1 + n2;
+	UpdateData(FALSE);
+}
