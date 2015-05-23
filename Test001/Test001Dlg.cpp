@@ -14,7 +14,7 @@
 
 // finestra di dialogo CTest001Dlg
 
-
+//DWORD WINAPI ThreadProc(LPVOID);
 
 CTest001Dlg::CTest001Dlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTest001Dlg::IDD, pParent)
@@ -23,6 +23,8 @@ CTest001Dlg::CTest001Dlg(CWnd* pParent /*=NULL*/)
 	n1 = 3;
 	n2 = 2;
 	n3 = 1;
+	StatoThreadA = _T("null");
+	StatoThreadB = _T("null");
 }
 
 void CTest001Dlg::DoDataExchange(CDataExchange* pDX)
@@ -32,6 +34,8 @@ void CTest001Dlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT1, n1);
 	DDX_Text(pDX, IDC_EDIT2, n2);
 	DDX_Text(pDX, IDC_EDIT3, n3);
+	DDX_Text(pDX, IDC_EDIT4, StatoThreadA);
+	DDX_Text(pDX, IDC_EDIT5, StatoThreadB);
 }
 
 BEGIN_MESSAGE_MAP(CTest001Dlg, CDialogEx)
@@ -41,6 +45,11 @@ BEGIN_MESSAGE_MAP(CTest001Dlg, CDialogEx)
 	ON_EN_CHANGE(IDC_EDIT1, &CTest001Dlg::OnEnChangeEdit1)
 	ON_EN_CHANGE(IDC_EDIT3, &CTest001Dlg::OnEnChangeEdit3)
 	ON_BN_CLICKED(IDC_BUTTON1, &CTest001Dlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON2, &CTest001Dlg::OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_BUTTON3, &CTest001Dlg::OnBnClickedButton3)
+	ON_BN_CLICKED(IDC_BUTTON4, &CTest001Dlg::OnBnClickedButton4)
+	ON_BN_CLICKED(IDC_BUTTON5, &CTest001Dlg::OnBnClickedButton5)
+	ON_BN_CLICKED(IDC_BUTTON6, &CTest001Dlg::OnBnClickedButton6)
 END_MESSAGE_MAP()
 
 
@@ -146,4 +155,108 @@ void CTest001Dlg::OnBnClickedButton1()
 
 	n3 = n1 + n2;
 	UpdateData(FALSE);
+}
+
+
+void CTest001Dlg::OnBnClickedButton2()
+{/*
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+	StatoThreadA = _T("creazione ThreadA"); UpdateData(FALSE);
+	aThread[0] = CreateThread(
+		NULL,       // default security attributes
+		0,          // default stack size
+		(LPTHREAD_START_ROUTINE)ThreadProc,
+		NULL,       // no thread function arguments
+		0,          // default creation flags
+		&ThreadID); // receive thread identifier
+	//StatoThreadA = _T("ThreadA creato"); UpdateData(TRUE);
+	/*if (aThread[0] == NULL)
+	{
+		StatoThreadA = _T("Errore ThreadA"); UpdateData(FALSE);
+		//printf("CreateThread error: %d\n", GetLastError());
+		//return;
+	}
+	else { StatoThreadA = _T("ThreadA creato"); UpdateData(FALSE); }
+	
+	StatoThreadA = _T("attendere, chiusura ThreadA in corso"); UpdateData(FALSE);
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+	WaitForMultipleObjects(1, aThread, TRUE, INFINITE);
+	bool a;
+	a=CloseHandle(aThread[0]);
+	if (aThread[0] == NULL)
+	{
+		StatoThreadA = _T("ThreadA chiuso"); UpdateData(FALSE);
+		//printf("CreateThread error: %d\n", GetLastError());
+		//return;
+	}
+	else {
+		StatoThreadA = _T("Errore ThreadA"); UpdateData(FALSE);
+	}
+	*/
+
+	aThread = new CWinThread();
+	aThread->m_bAutoDelete = FALSE;
+	aThread->CreateThread(CREATE_SUSPENDED);
+	StatoThreadA = _T("ThreadA creato"); UpdateData(FALSE);
+
+}
+
+
+void CTest001Dlg::OnBnClickedButton3()
+{
+
+	/*StatoThreadA = _T("attendere, chiusura ThreadA in corso"); UpdateData(FALSE);
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+	WaitForMultipleObjects(1, aThread, TRUE, INFINITE);
+	bool a;
+	a=CloseHandle(aThread[0]);
+		if (aThread[0] == NULL)
+		{
+			StatoThreadA = _T("ThreadA chiuso"); UpdateData(FALSE);
+				//printf("CreateThread error: %d\n", GetLastError());
+				//return;
+		}
+		else { StatoThreadA = _T("Errore ThreadA"); UpdateData(FALSE);
+		}*/
+	delete aThread;
+	aThread = NULL;
+	StatoThreadA = _T("ThreadA chiuso"); UpdateData(FALSE);
+}
+
+/*
+DWORD WINAPI ThreadProc(LPVOID lpParam)
+{
+	//while (TRUE)
+	//{
+		//StatoThreadB = _T("Elaborazione iniziata"); UpdateData(FALSE);
+		Sleep(5000);
+		//StatoThreadB = _T("Elaborazione finita"); UpdateData(FALSE);
+	//}
+	return 0;
+}*/
+
+void CTest001Dlg::OnBnClickedButton4()
+{
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+
+	aThread->ResumeThread();
+	StatoThreadA = _T("ThreadA ripristinato"); UpdateData(FALSE);
+}
+
+
+void CTest001Dlg::OnBnClickedButton5()
+{
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+
+	aThread->SuspendThread();
+	StatoThreadA = _T("ThreadA sospeso"); UpdateData(FALSE);
+}
+
+
+void CTest001Dlg::OnBnClickedButton6()
+{
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+
+	//aThread->
+	//StatoThreadA = _T("ThreadA sospeso"); UpdateData(FALSE);
 }
