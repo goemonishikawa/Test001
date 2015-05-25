@@ -26,9 +26,9 @@
 #ifndef _AFX_NO_OLE_SUPPORT
 #include <afxdtctl.h>           // Supporto MFC per controlli comuni di Internet Explorer 4
 #endif
-#ifndef _AFX_NO_AFXCMN_SUPPORT
+//#ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h>             // Supporto MFC per controlli comuni di Windows
-#endif // _AFX_NO_AFXCMN_SUPPORT
+//#endif // _AFX_NO_AFXCMN_SUPPORT
 
 #include <afxcontrolbars.h>     // Supporto MFC per barre di controllo e barre multifunzione
 

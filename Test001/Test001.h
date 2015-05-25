@@ -18,8 +18,9 @@
 class CTest001App : public CWinApp
 {
 public:
+//CTest001Dlg dlg;
 	CTest001App();
-
+	
 // Override
 public:
 	virtual BOOL InitInstance();
