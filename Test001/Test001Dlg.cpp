@@ -23,7 +23,12 @@ CTest001Dlg::CTest001Dlg(CWnd* pParent /*=NULL*/)
 	n3 = 1;
 	StatoThreadA = _T("null");
 	StatoThreadB = _T("null");
+	StatoA = _T("null");
+	StatoB = _T("null");
 	StatoThreadC = _T("null");
+	_param = new THREADSTRUCT;
+	_param->_this = this;
+	p = 100;
 }
 
 void CTest001Dlg::DoDataExchange(CDataExchange* pDX)
@@ -36,7 +41,11 @@ void CTest001Dlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT4, StatoThreadA);
 	DDX_Text(pDX, IDC_EDIT5, StatoThreadB);
 	DDX_Text(pDX, IDC_EDIT6, StatoThreadC);
-	DDX_Control(pDX, IDC_PROGRESS1, m_Progress);
+	DDX_Text(pDX, IDC_EDIT7, StatoA);
+	DDX_Text(pDX, IDC_EDIT8, StatoB);
+	DDX_Control(pDX, IDC_PROGRESS1, m_ProgressA);
+	DDX_Control(pDX, IDC_PROGRESS2, m_ProgressB);
+	DDX_Control(pDX, IDC_PROGRESS3, m_ProgressC);
 
 }
 
@@ -53,6 +62,11 @@ BEGIN_MESSAGE_MAP(CTest001Dlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON5, &CTest001Dlg::OnBnClickedButton5)
 	ON_BN_CLICKED(IDC_BUTTON6, &CTest001Dlg::OnBnClickedButton6)
 	ON_EN_CHANGE(IDC_EDIT6, &CTest001Dlg::OnEnChangeEdit6)
+	ON_BN_CLICKED(IDC_BUTTON7, &CTest001Dlg::OnBnClickedButton7)
+	ON_BN_CLICKED(IDC_BUTTON8, &CTest001Dlg::OnBnClickedButton8)
+	ON_BN_CLICKED(IDC_BUTTON9, &CTest001Dlg::OnBnClickedButton9)
+	ON_BN_CLICKED(IDC_BUTTON10, &CTest001Dlg::OnBnClickedButton10)
+	ON_BN_CLICKED(IDC_BUTTON11, &CTest001Dlg::OnBnClickedButton11)
 END_MESSAGE_MAP()
 
 // gestori di messaggi di CTest001Dlg
@@ -67,6 +81,8 @@ BOOL CTest001Dlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Impostare icona piccola.
 
 	// TODO: aggiungere qui inizializzazione aggiuntiva.
+	m_ProgressC.SetRange(1, 200);
+	m_ProgressC.SetPos(p);
 
 	return TRUE;  // restituisce TRUE a meno che non venga impostato lo stato attivo su un controllo.
 }
@@ -159,9 +175,8 @@ void CTest001Dlg::OnBnClickedButton2()
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 
 	//call the thread on a button action or menu
-	_param = new THREADSTRUCT;
-	_param->_this = this;
-	pThread = AfxBeginThread(StartThread, _param);
+
+	pThreadA = AfxBeginThread(StartThreadA, _param);
 	StatoThreadA = _T("ThreadA creato"); UpdateData(FALSE);
 
 }
@@ -178,7 +193,7 @@ void CTest001Dlg::OnBnClickedButton4()
 {
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 
-	pThread->ResumeThread();
+	pThreadA->ResumeThread();
 	StatoThreadA = _T("ThreadA ripristinato"); UpdateData(FALSE);
 }
 
@@ -187,7 +202,7 @@ void CTest001Dlg::OnBnClickedButton5()
 {
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 
-	pThread->SuspendThread();
+	pThreadA->SuspendThread();
 	StatoThreadA = _T("ThreadA sospeso"); UpdateData(FALSE);
 }
 
@@ -215,20 +230,62 @@ void CTest001Dlg::OnEnChangeEdit6()
 }
 
 
-UINT CTest001Dlg::StartThread(LPVOID param)
+UINT CTest001Dlg::StartThreadA(LPVOID param)
 {
 	THREADSTRUCT*    ts = (THREADSTRUCT*)param;
 
 	UINT nIterations = 100;
-	ts->_this->m_Progress.SetRange(1, 100);
+	ts->_this->m_ProgressA.SetRange(1, 100);
 
 	for (UINT i = 1; i <= nIterations; i++)
 	{
-		Sleep(50);
+		//Sleep(200);
+		CString aa;
+		aa.Format(_T("%d"), i);
+		ts->_this->StatoThreadA = aa;
+		ts->_this->m_ProgressA.SetPos(i);
+
+		g_cs.Lock();
+
+		Sleep(250);
+		ts->_this->p = ts->_this->p + 1;
+
+		g_cs.Unlock();
+
+		ts->_this->m_ProgressC.SetPos(ts->_this->p);
+		ts->_this->StatoThreadC.Format(_T("%d"), ts->_this->p);
+
+
+		ts->_this->UpdateData(FALSE);
+
+	}
+	return 1;
+}
+
+UINT CTest001Dlg::StartThreadB(LPVOID param)
+{
+	THREADSTRUCT*    ts = (THREADSTRUCT*)param;
+
+	UINT nIterations = 100;
+	ts->_this->m_ProgressB.SetRange(1, 100);
+
+	for (UINT i = 1; i <= nIterations; i++)
+	{
+		//Sleep(100);
 		CString aa;
 		aa.Format(_T("%d"), i);
 		ts->_this->StatoThreadB = aa;
-		ts->_this->m_Progress.SetPos(i);
+		ts->_this->m_ProgressB.SetPos(i);
+
+		g_cs.Lock();
+
+		Sleep(500);
+		ts->_this->p = ts->_this->p - 1;
+
+		g_cs.Unlock();
+
+		ts->_this->m_ProgressC.SetPos(ts->_this->p);
+		ts->_this->StatoThreadC.Format(_T("%d"), ts->_this->p);
 		ts->_this->UpdateData(FALSE);
 	}
 	return 1;
@@ -237,4 +294,36 @@ UINT CTest001Dlg::StartThread(LPVOID param)
 CTest001Dlg::~CTest001Dlg()
 {
 	if (_param != NULL) delete _param;
+}
+
+void CTest001Dlg::OnBnClickedButton7()
+{
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+	pThreadB = AfxBeginThread(StartThreadB, _param);
+	StatoThreadB = _T("ThreadB creato"); UpdateData(FALSE);
+
+}
+
+
+void CTest001Dlg::OnBnClickedButton8()
+{
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+}
+
+
+void CTest001Dlg::OnBnClickedButton9()
+{
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+}
+
+
+void CTest001Dlg::OnBnClickedButton10()
+{
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+}
+
+
+void CTest001Dlg::OnBnClickedButton11()
+{
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }

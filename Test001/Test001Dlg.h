@@ -3,9 +3,10 @@
 //
 
 #pragma once
-
-
-
+//#include <afxmt.h> 
+//static 
+static CCriticalSection g_cs;
+//static int p;
 // finestra di dialogo CTest001Dlg
 class CTest001Dlg : public CDialogEx
 {
@@ -20,7 +21,11 @@ public:
 	THREADSTRUCT *_param;
 
 	CTest001Dlg(CWnd* pParent = NULL);	// costruttore standard
-	static UINT StartThread(LPVOID param);
+	
+	static UINT StartThreadA(LPVOID param);
+	static UINT StartThreadB(LPVOID param);
+	//static CCriticalSection g_cs;
+	int p;
 
 
 	// Dati della finestra di dialogo
@@ -31,10 +36,15 @@ public:
 	CString	StatoThreadA;
 	CString	StatoThreadB;
 	CString	StatoThreadC;
+	CString	StatoA;
+	CString	StatoB;
 
-	CProgressCtrl m_Progress;
+	CProgressCtrl m_ProgressA;
+	CProgressCtrl m_ProgressB;
+	CProgressCtrl m_ProgressC;
 
-	CWinThread* pThread;
+	CWinThread* pThreadA;
+	CWinThread* pThreadB;
 	DWORD threadInfo;
 
 	~CTest001Dlg();
@@ -61,4 +71,9 @@ public:
 	afx_msg void OnBnClickedButton5();
 	afx_msg void OnBnClickedButton6();
 	afx_msg void OnEnChangeEdit6();
+	afx_msg void OnBnClickedButton7();
+	afx_msg void OnBnClickedButton8();
+	afx_msg void OnBnClickedButton9();
+	afx_msg void OnBnClickedButton10();
+	afx_msg void OnBnClickedButton11();
 };
