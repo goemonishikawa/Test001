@@ -38,6 +38,8 @@ public:
 	CString	StatoThreadC;
 	CString	StatoA;
 	CString	StatoB;
+	bool ThreadA;
+	bool ThreadB;
 
 	CProgressCtrl m_ProgressA;
 	CProgressCtrl m_ProgressB;

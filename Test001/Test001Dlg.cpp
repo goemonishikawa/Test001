@@ -23,12 +23,15 @@ CTest001Dlg::CTest001Dlg(CWnd* pParent /*=NULL*/)
 	n3 = 1;
 	StatoThreadA = _T("null");
 	StatoThreadB = _T("null");
-	StatoA = _T("null");
-	StatoB = _T("null");
+	StatoA = _T("");
+	StatoB = _T("");
 	StatoThreadC = _T("null");
 	_param = new THREADSTRUCT;
 	_param->_this = this;
 	p = 100;
+	ThreadA=FALSE;
+	ThreadB = FALSE;
+
 }
 
 void CTest001Dlg::DoDataExchange(CDataExchange* pDX)
@@ -178,6 +181,7 @@ void CTest001Dlg::OnBnClickedButton2()
 
 	pThreadA = AfxBeginThread(StartThreadA, _param);
 	StatoThreadA = _T("ThreadA creato"); UpdateData(FALSE);
+	ThreadA = TRUE;
 
 }
 
@@ -186,6 +190,7 @@ void CTest001Dlg::OnBnClickedButton3()
 {
 
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+	ThreadA = FALSE;
 }
 
 
@@ -210,7 +215,23 @@ void CTest001Dlg::OnBnClickedButton5()
 void CTest001Dlg::OnBnClickedButton6()
 {
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
-	StatoThreadC = StatoThreadB; UpdateData(FALSE);
+
+	DWORD dwExitCode;
+	::GetExitCodeThread(pThreadA->m_hThread, &dwExitCode);
+	if (dwExitCode == STILL_ACTIVE) {
+
+		// The thread is still running.
+
+		StatoThreadA = _T("ThreadA Attivo"); UpdateData(FALSE);
+	}
+	else {
+		// The thread has terminated. Delete the CWinThread object.
+		//delete pThreadA;
+		StatoThreadA = _T("ThreadA chiuso"); UpdateData(FALSE);
+	}
+
+
+	
 }
 
 
@@ -237,28 +258,42 @@ UINT CTest001Dlg::StartThreadA(LPVOID param)
 	UINT nIterations = 100;
 	ts->_this->m_ProgressA.SetRange(1, 100);
 
-	for (UINT i = 1; i <= nIterations; i++)
-	{
+	//for (UINT i = 1; i <= nIterations; i++)
+	//{
 		//Sleep(200);
 		CString aa;
-		aa.Format(_T("%d"), i);
-		ts->_this->StatoThreadA = aa;
-		ts->_this->m_ProgressA.SetPos(i);
+		UINT i = 1;
+		while (TRUE)
+		{
+			if (i == nIterations) i = 1;
+			
+			aa.Format(_T("%d"), i);
+			ts->_this->StatoThreadA = aa;
+			ts->_this->m_ProgressA.SetPos(i);
 
-		g_cs.Lock();
-
-		Sleep(250);
-		ts->_this->p = ts->_this->p + 1;
-
-		g_cs.Unlock();
-
-		ts->_this->m_ProgressC.SetPos(ts->_this->p);
-		ts->_this->StatoThreadC.Format(_T("%d"), ts->_this->p);
+			g_cs.Lock();
+			ts->_this->StatoA = _T("sezione critica"); ts->_this->UpdateData(FALSE);
 
 
-		ts->_this->UpdateData(FALSE);
+			Sleep(125);
+			if (ts->_this->p<200)ts->_this->p = ts->_this->p + 1;
 
-	}
+			g_cs.Unlock();
+			ts->_this->StatoA = _T("no"); ts->_this->UpdateData(FALSE);
+
+			ts->_this->m_ProgressC.SetPos(ts->_this->p);
+			ts->_this->StatoThreadC.Format(_T("%d"), ts->_this->p);
+
+
+			ts->_this->UpdateData(FALSE);
+			if (ts->_this->ThreadA == FALSE) 
+			{ 
+				ts->_this->StatoThreadA = _T("ThreadA chiuso"); ts->_this->UpdateData(FALSE);
+				return 1; 
+			}
+			i++;
+		}
+	//}
 	return 1;
 }
 
@@ -269,25 +304,38 @@ UINT CTest001Dlg::StartThreadB(LPVOID param)
 	UINT nIterations = 100;
 	ts->_this->m_ProgressB.SetRange(1, 100);
 
-	for (UINT i = 1; i <= nIterations; i++)
-	{
+	//for (UINT i = 1; i <= nIterations; i++)
+	//{
 		//Sleep(100);
 		CString aa;
-		aa.Format(_T("%d"), i);
-		ts->_this->StatoThreadB = aa;
-		ts->_this->m_ProgressB.SetPos(i);
+		UINT i = 1;
+		while (TRUE) {
+			if (i == nIterations) i = 1;
+			aa.Format(_T("%d"), i);
+			ts->_this->StatoThreadB = aa;
+			ts->_this->m_ProgressB.SetPos(i);
 
-		g_cs.Lock();
+			g_cs.Lock();
+			ts->_this->StatoB = _T("sezione critica"); ts->_this->UpdateData(FALSE);
 
-		Sleep(500);
-		ts->_this->p = ts->_this->p - 1;
+			Sleep(250);
+			if (ts->_this->p>0)ts->_this->p = ts->_this->p - 1;
 
-		g_cs.Unlock();
+			g_cs.Unlock();
+			ts->_this->StatoB = _T("no"); ts->_this->UpdateData(FALSE);
 
-		ts->_this->m_ProgressC.SetPos(ts->_this->p);
-		ts->_this->StatoThreadC.Format(_T("%d"), ts->_this->p);
-		ts->_this->UpdateData(FALSE);
-	}
+			ts->_this->m_ProgressC.SetPos(ts->_this->p);
+			ts->_this->StatoThreadC.Format(_T("%d"), ts->_this->p);
+			ts->_this->UpdateData(FALSE);
+
+			if (ts->_this->ThreadB == FALSE) 
+			{
+				ts->_this->StatoThreadB = _T("ThreadB chiuso"); ts->_this->UpdateData(FALSE);
+				return 1;
+			}
+			i++;
+		}
+	//}
 	return 1;
 }
 
@@ -301,6 +349,7 @@ void CTest001Dlg::OnBnClickedButton7()
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 	pThreadB = AfxBeginThread(StartThreadB, _param);
 	StatoThreadB = _T("ThreadB creato"); UpdateData(FALSE);
+	ThreadB = TRUE;
 
 }
 
@@ -308,22 +357,48 @@ void CTest001Dlg::OnBnClickedButton7()
 void CTest001Dlg::OnBnClickedButton8()
 {
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+	ThreadB = FALSE;
 }
 
 
 void CTest001Dlg::OnBnClickedButton9()
 {
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+	pThreadB->ResumeThread();
+	StatoThreadB = _T("ThreadB ripristinato"); UpdateData(FALSE);
+
 }
 
 
 void CTest001Dlg::OnBnClickedButton10()
 {
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+	pThreadB->SuspendThread();
+	StatoThreadB = _T("ThreadB sospeso"); UpdateData(FALSE);
+
 }
 
 
 void CTest001Dlg::OnBnClickedButton11()
 {
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+
+	//errore usare afx tipo AfxBeginThread ma per chiudere il thread
+
+	DWORD dwExitCode;
+	::GetExitCodeThread(pThreadB->m_hThread, &dwExitCode);
+	if (dwExitCode == STILL_ACTIVE) {
+
+		// The thread is still running.
+
+		StatoThreadB = _T("ThreadB Attivo"); UpdateData(FALSE);
+	}
+	else {
+		// The thread has terminated. Delete the CWinThread object.
+		//delete pThreadB;
+		StatoThreadB = _T("ThreadB chiuso"); UpdateData(FALSE);
+	}
+
+
+	
 }
